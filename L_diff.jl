@@ -2,20 +2,20 @@
 
 function df!(du,u,p,t)
     @unpack_parameters p
-    Integral = sum(Aβρ .* u.^((1+η/(1-β))*(ρ-1)/ρ)) * Δx
-    du .= -(1-β)/Integral * ∂x(u .* ∂x(Aβρ .* u.^(η/(1-β)*(ρ-1)/ρ - 1/ρ),p),p)       
+    profits = computeProfits(u,p)
+    du .= -(1-β) * ∂x(u .* ∂x(profits,p),p)       
     @show t
 end
 
 function dfFixedCost!(du,u,p,t)
     @unpack_parameters p
-    Integral = sum(Aβρ .* u.^((1+η/(1-β))*(ρ-1)/ρ)) * Δx
-    ∂xπ = ∂x(Aβρ .* u.^(η/(1-β)*(ρ-1)/ρ - 1/ρ),p)
-
-    du .= -(1-β)/Integral * ∂x(u .* ∂xπ,p) .* convolve(Float64.(abs.(∂xπ) .> c₀),K,p)
+    profits = computeProfits(u,p)
+    ∂xπ = ∂x(profits,p)
+    
+    du .= -(1-β) * ∂x(u .* ∂xπ,p) .* convolve(Float64.(abs.(∂xπ) .> c₀),K,p)
+    # du .= -(1-β) * ∂x(u .* ∂xπ,p) .* Float64.(abs.(∂xπ) .> c₀)
     @show t
 end
-
 
 
 function Δ(f,p)

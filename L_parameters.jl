@@ -1,26 +1,26 @@
 
-@with_kw struct parameters
+@with_kw mutable struct parameters
 
     # model     
     β::Float64 = 0.88
     a::Float64 = 0.214
     b::Float64 = 0.04
-    ρ::Float64 = σ*(1-β) + β
-    c₀::Float64 = 0.5
     η::Float64 = β * (a/b-1) / (a/b) -1
     σ::Float64 = 1 + a / (β*(1+b) - a)
+    ρ::Float64 = σ*(1-β) + β
+    c₀::Float64 = 0.05
 
     # domain
     n::Float64 = 1.0
     # T_end::Float64 = 2.0
-    T_end::Float64 = 0.1
+    T_end::Float64 = 2.0
     
     # numerical
     Δx::Float64 = 5*1e-3
     Nx::Int = Int(n/Δx)
     x::LinRange{Float64, Int64} = LinRange(0,n-Δx,Nx)
     t_save::LinRange{Float64, Int64} = LinRange(0,T_end,1000)
-    h::Float64 = 0.01    # smoothing parameter when needed
+    h::Float64 = 0.05    # smoothing parameter when needed
 
     # initial condition
     freq::Int64 = 1
@@ -33,7 +33,8 @@
     shiftA::Float64 = 0.0
     # A::Vector{Float64} = computeA(Δx,x,n,4,height,2.0,-0.25)
     A::Vector{Float64} = ones(Nx)
-    Aβρ::Vector{Float64} = A.^(1/(1-β) * (ρ-1)/ρ )
+    L::Vector{Float64} = ones(Nx)
+    ALβσ::Vector{Float64} = (A.*L.^β).^((σ-1)/σ)
 
     # checks
     @assert σ != 1.0
@@ -48,9 +49,9 @@ function initialCondition(Δx,x,n,freq,height,mass,shift)
     y = f.(x[1:round(Int,Nx/2)])
     μ₀ = mirror(y)
     μ₀ = μ₀/sum(μ₀*Δx)
+
     # μ₀ .= shuffle(μ₀)
     # circshift!(μ₀,round(Int,Nx/5))
-
     # μ₀ = sin.(2*π*(x .+ shift)/n*freq ) .+ height
     # μ₀ = mass * μ₀ / ( sum(μ₀) * Δx )
     return μ₀
@@ -62,10 +63,4 @@ function computeA(Δx,x,n,freq,height,mass,shiftA)
     A = mass * A / ( sum(A) * Δx )
     return A
 end
-
-β = 0.88
-a = 0.214
-b = 0.04
-η = β * (a/b-1) / (a/b) -1
-σ = 1 + a / (β*(1+b) - a)
 

@@ -16,8 +16,3 @@ function solveModelFixedCost(p)
     return sol,p
 end
 
-# p = parameters();
-# sol,p = solveModelUniform(p);
-# plotSol(sol,p);
-
-
