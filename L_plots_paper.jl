@@ -1,7 +1,11 @@
 set_theme!(Theme(
-    fontsize = 20  # Set default font size for the whole figure
+    fontsize = 20, # Set default font size for the whole figure
+    palette = (
+        color = [:black])  # all elements will be black
 ))
 
+# Set it globally
+set_theme!(bw_theme)
 function plot1(sol,p,T1,T2)
 
     @unpack_parameters p
@@ -23,12 +27,12 @@ function plot1(sol,p,T1,T2)
 
 
     # Create lines for each plot
-    mu1_line = lines!(ax, x, sol(T1), linewidth = 3, label = "Firms' density at t = " * string(round(T1,digits = 3)))
-    mu2_line = lines!(ax, x, sol(T2), linewidth = 3, label = "Firms' density at t = " * string(round(T2,digits = 3)))
-    profits1_line = lines!(ax2, x, profits1, linewidth = 3, label = "Profits per sector at t = " * string(round(T1,digits = 3)))
-    profits2_line = lines!(ax2, x, profits2, linewidth = 3, label = "Profits per sector at t = " * string(round(T2,digits = 3)))
-    firm_eq = lines!(ax, x, muEq, linewidth = 3, label = "Firms' density equilibirum")
-    profit_eq = lines!(ax2, x, profitsEq, linewidth = 3, label = "Firms' profits equilibirum")
+    mu1_line = lines!(ax, x, sol(T1), linewidth = 3, label = "Firms' density at t = " * string(round(T1,digits = 3)),linestyle = :solid)
+    mu2_line = lines!(ax, x, sol(T2), linewidth = 3, label = "Firms' density at t = " * string(round(T2,digits = 3)),linestyle = :dash)
+    profits1_line = lines!(ax2, x, profits1, linewidth = 3, label = "Profits per sector at t = " * string(round(T1,digits = 3)),linestyle = :solid)
+    profits2_line = lines!(ax2, x, profits2, linewidth = 3, label = "Profits per sector at t = " * string(round(T2,digits = 3)),linestyle = :dash)
+    firm_eq = lines!(ax, x, muEq, linewidth = 3, label = "Firms' density equilibirum",linestyle = :dot)
+    profit_eq = lines!(ax2, x, profitsEq, linewidth = 3, label = "Firms' profits equilibirum",linestyle = :dot)
 
     # Add legend
     axislegend(ax)
@@ -63,9 +67,9 @@ function plot2(sol,p,T1,T2,T3)
          title = "",limits = (profits0Min, profits0Max, ΔprofitsMin, ΔprofitsMax))
     
 
-    profits1_line = scatter!(ax, profits0, Δprofits1, label = "π(" * string(round(T1,digits=3)) * ") - π(0)")
-    profits2_line = scatter!(ax, profits0, Δprofits2, label = "π(" * string(round(T2,digits=3)) * ") - π(0)")
-    profits3_line = scatter!(ax, profits0, Δprofits3, label = "π(" * string(round(T3,digits=3)) * ") - π(0)")
+    profits1_line = scatter!(ax, profits0, Δprofits1, label = "π(" * string(round(T1,digits=3)) * ") - π(0)", marker = :circle)
+    profits2_line = scatter!(ax, profits0, Δprofits2, label = "π(" * string(round(T2,digits=3)) * ") - π(0)", marker = :star4)
+    profits3_line = scatter!(ax, profits0, Δprofits3, label = "π(" * string(round(T3,digits=3)) * ") - π(0)", marker = :dtriangle)
 
     axislegend(ax)
     display(fig)
@@ -84,28 +88,28 @@ function plot3()
     sol,p = solveModel(p)
     muEq = (A .* L.^β).^((σ-1)/( σ*(β-η)*(σ-1)/σ + 1 ) ) / sum((A .* L.^β).^((σ-1)/( σ*(β-η)*(σ-1)/σ + 1 ) ) * Δx)
     errNorm2 = [sqrt.(sum((sol(t) - muEq).^2*Δx)) for t in sol.t]
-    lines!(ax, sol.t, log.(errNorm2), linewidth = 3, label = "Error norm baseline")
+    lines!(ax, sol.t, log.(errNorm2), linewidth = 3, label = "Error norm baseline",linestyle = :solid)
 
     p = paramList[2]
     @unpack_parameters p
     sol,p = solveModel(p)
     muEq = (A .* L.^β).^((σ-1)/( σ*(β-η)*(σ-1)/σ + 1 ) ) / sum((A .* L.^β).^((σ-1)/( σ*(β-η)*(σ-1)/σ + 1 ) ) * Δx)
     errNorm2 = [sqrt.(sum((sol(t) - muEq).^2*Δx)) for t in sol.t]
-    lines!(ax, sol.t, log.(errNorm2), linewidth = 3, label = "Error norm β = 0.6")
+    lines!(ax, sol.t, log.(errNorm2), linewidth = 3, label = "Error norm β = 0.6",linestyle = :dash)
 
     p = paramList[3]
     @unpack_parameters p
     sol,p = solveModel(p)
     muEq = (A .* L.^β).^((σ-1)/( σ*(β-η)*(σ-1)/σ + 1 ) ) / sum((A .* L.^β).^((σ-1)/( σ*(β-η)*(σ-1)/σ + 1 ) ) * Δx)
     errNorm2 = [sqrt.(sum((sol(t) - muEq).^2*Δx)) for t in sol.t]
-    lines!(ax, sol.t, log.(errNorm2), linewidth = 3, label = "Error norm σ = 0.7")
+    lines!(ax, sol.t, log.(errNorm2), linewidth = 3, label = "Error norm σ = 0.7",linestyle = :dot)
 
     p = paramList[4]
     @unpack_parameters p
     sol,p = solveModel(p)
     muEq = (A .* L.^β).^((σ-1)/( σ*(β-η)*(σ-1)/σ + 1 ) ) / sum((A .* L.^β).^((σ-1)/( σ*(β-η)*(σ-1)/σ + 1 ) ) * Δx)
     errNorm2 = [sqrt.(sum((sol(t) - muEq).^2*Δx)) for t in sol.t]
-    lines!(ax, sol.t, log.(errNorm2), linewidth = 3, label = "Error norm η = 0.3")
+    lines!(ax, sol.t, log.(errNorm2), linewidth = 3, label = "Error norm η = 0.3",linestyle = :dashdot)
 
     axislegend(ax)
     display(fig)
@@ -126,7 +130,7 @@ function plot4()
     XEq = computeX(muEq,p)
     Xt = [computeX(sol(t),p) for t in sol.t]
     logErr = log.(XEq./Xt)
-    lines!(ax, sol.t, logErr, linewidth = 3, label = "Error norm baseline")
+    lines!(ax, sol.t, logErr, linewidth = 3, label = "Error norm baseline",linestyle = :solid)
 
     p = paramList[2]
     @unpack_parameters p
@@ -135,7 +139,7 @@ function plot4()
     XEq = computeX(muEq,p)
     Xt = [computeX(sol(t),p) for t in sol.t]
     logErr = log.(XEq./Xt)
-    lines!(ax, sol.t, logErr, linewidth = 3, label = "Error norm β = 0.8")
+    lines!(ax, sol.t, logErr, linewidth = 3, label = "Error norm β = 0.8",linestyle = :dash)
 
     p = paramList[3]
     @unpack_parameters p
@@ -144,7 +148,7 @@ function plot4()
     XEq = computeX(muEq,p)
     Xt = [computeX(sol(t),p) for t in sol.t]
     logErr = log.(XEq./Xt)
-    lines!(ax, sol.t, logErr, linewidth = 3, label = "Error norm σ = 0.3")
+    lines!(ax, sol.t, logErr, linewidth = 3, label = "Error norm σ = 0.3",linestyle = :dot)
 
     p = paramList[4]
     @unpack_parameters p
@@ -153,7 +157,7 @@ function plot4()
     XEq = computeX(muEq,p)
     Xt = [computeX(sol(t),p) for t in sol.t]
     logErr = log.(XEq./Xt)
-    lines!(ax, sol.t, logErr, linewidth = 3, label = "Error norm η = -0.5")
+    lines!(ax, sol.t, logErr, linewidth = 3, label = "Error norm η = -0.5",linestyle = :dashdot)
 
     axislegend(ax)
     display(fig)
@@ -186,9 +190,9 @@ function plot5(p,T1,T2,T3)
          title = "",limits = (profits0Min, profits0Max, ΔprofitsMin, ΔprofitsMax))
     
 
-    profits1_line = scatter!(ax, profits0, Δprofits1, label = "π(" * string(round(T1,digits=3)) * ") - π(0)")
-    profits2_line = scatter!(ax, profits0, Δprofits2, label = "π(" * string(round(T2,digits=3)) * ") - π(0)")
-    profits3_line = scatter!(ax, profits0, Δprofits3, label = "π(" * string(round(T3,digits=3)) * ") - π(0)")
+    profits1_line = scatter!(ax, profits0, Δprofits1, label = "π(" * string(round(T1,digits=3)) * ") - π(0)", marker = :circle)
+    profits2_line = scatter!(ax, profits0, Δprofits2, label = "π(" * string(round(T2,digits=3)) * ") - π(0)", marker = :star4)
+    profits3_line = scatter!(ax, profits0, Δprofits3, label = "π(" * string(round(T3,digits=3)) * ") - π(0)", marker = :dtriangle)
      
     axislegend(ax)
     display(fig)
@@ -214,9 +218,9 @@ function plot6(p,T1,T2,T3)
     ax = Axis(fig[1, 1], xlabel = "Type of goods", ylabel = "Profits π", title = "",limits = (0, n, profitsMin, profitsMax))
 
     # Create lines for each plot
-    profits1_line = lines!(ax, x, profits1, linewidth = 3, label = "Profits per sector at t = " * string(round(T1,digits = 3)))
-    profits2_line = lines!(ax, x, profits2, linewidth = 3, label = "Profits per sector at t = " * string(round(T2,digits = 3)))
-    profits3_line = lines!(ax, x, profits3, linewidth = 3, label = "Profits per sector at t = " * string(round(T3,digits = 3)))
+    profits1_line = lines!(ax, x, profits1, linewidth = 3, label = "Profits per sector at t = " * string(round(T1,digits = 3)),linestyle = :solid)
+    profits2_line = lines!(ax, x, profits2, linewidth = 3, label = "Profits per sector at t = " * string(round(T2,digits = 3)),linestyle = :dash)
+    profits3_line = lines!(ax, x, profits3, linewidth = 3, label = "Profits per sector at t = " * string(round(T3,digits = 3)),linestyle = :dot)
 
     # Add legend
     axislegend(ax)
@@ -231,9 +235,9 @@ function plot6(p,T1,T2,T3)
 end
 
 
-# plot1(sol,p,0,0.2)
-# plot2(sol,p,0.01,0.5,2)
-# plot3()
-# plot4()
-# plot5(p,0.01,0.5,2)
-# plot6(p,0,0.2,2)
+plot1(sol,p,0,0.2)
+plot2(sol,p,0.01,0.5,2)
+plot3()
+plot4()
+plot5(p,0.01,0.5,2)
+plot6(p,0,0.2,2)
