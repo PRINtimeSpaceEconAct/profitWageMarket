@@ -48,14 +48,10 @@ sol_fc, p = solveModelFixedCost(p) # Fixed cost
 # Generate specific figures
 plot1(sol, p, 0.0, 0.2)  # Density and profits over space
 plot2(sol, p, 0.01, 0.5, 2.0)  # Profit variation scatter
+# others related to other figures
 ```
 
 ## Customization
 
 - Modify parameters in `L_parameters.jl`
-- Add new profit functions in `L_utils.jl` 
-- Create custom plots following the style in `L_plots_paper.jl`
 
-## Dependencies
-
-Standard Julia packages: DifferentialEquations.jl, Makie.jl, Parameters.jl
