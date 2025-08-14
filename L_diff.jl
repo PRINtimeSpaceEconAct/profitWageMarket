@@ -7,6 +7,13 @@ function df!(du,u,p,t)
     @show t
 end
 
+function dfMobile!(du,u,p,t)
+    @unpack_parameters p
+    profits = computeProfitsMobile(u,p)
+    du .= -(1-β) * ∂x(u .* ∂x(profits,p),p)       
+    @show t
+end
+
 function dfFixedCost!(du,u,p,t)
     @unpack_parameters p
     profits = computeProfits(u,p)

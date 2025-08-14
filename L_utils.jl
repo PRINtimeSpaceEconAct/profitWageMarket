@@ -4,6 +4,14 @@ function computeProfits(μ,p)
     return profits
 end
 
+function computeProfitsMobile(μ,p)
+    @unpack_parameters p
+    α = (σ - 1) / (σ*(1 - β) + β)
+    γ = (η*(σ - 1) - 1) / (σ*(1 - β) + β)
+    profits = (1 - β) * A.^α .* μ.^γ / sum((A .* μ.^(1 - β + η)).^α * Δx)
+    return profits
+end
+
 function computeProduction(μ,p)
     @unpack_parameters p
     Y = ALβσ .* μ.^((η-β)*(σ-1)/σ) / sum(ALβσ .* μ.^((1+η-β)*(σ-1)/σ) * Δx)
@@ -16,8 +24,22 @@ function computeP(μ,p)
     return P
 end
 
+function computePMobile(μ,p)
+    @unpack_parameters p
+    P = sum((A .* μ.^(1-β)).^((σ-1)/(σ*(1-β)+β)) * Δx)^((σ*(1-β)+β)/(1-σ))
+    return P
+end
+
+
 function computeX(μ,p) 
     X = 1 ./ computeP(μ,p)
+    return X
+end
+
+function computeXMobile(μ,p) 
+    @unpack_parameters p
+    α = (σ - 1) / (σ*(1 - β) + β)
+    X = sum((A .* μ.^(1 - β + η)).^α * Δx) ^ ((σ*(1 - β) + β) / (σ - 1))
     return X
 end
 

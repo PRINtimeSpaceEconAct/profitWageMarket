@@ -2,13 +2,19 @@
 @with_kw mutable struct parameters
 
     # model     
-    β::Float64 = 0.88
-    a::Float64 = 0.214
-    b::Float64 = 0.04
-    η::Float64 = β * (a/b-1) / (a/b) -1
-    σ::Float64 = 1 + a / (β*(1+b) - a)
+    β::Float64 = 0.86
+    # β::Float64 = 0.5
+    ρ1::Float64 = 0.214
+    ρ2::Float64 = 0.04
+    η::Float64 = β * (1+ρ2/ρ1) - 1  
+    # η::Float64 = 1.2
+    σ::Float64 = 1 + ρ1 / (β*(1+ρ2) - ρ1)
+    # σ::Float64 = 2.0
     ρ::Float64 = σ*(1-β) + β
-    c₀::Float64 = 0.05
+    # c₀::Float64 = 0.05
+    c₀::Float64 = 0.1
+
+
 
     # domain
     n::Float64 = 1.0
@@ -33,7 +39,8 @@
     shiftA::Float64 = 0.0
     # A::Vector{Float64} = computeA(Δx,x,n,4,height,2.0,-0.25)
     A::Vector{Float64} = ones(Nx)
-    L::Vector{Float64} = ones(Nx)
+    # L::Vector{Float64} = ones(Nx)
+    L::Vector{Float64} = computeA(Δx,x,n,1,height,1.0,-0.25)
     ALβσ::Vector{Float64} = (A.*L.^β).^((σ-1)/σ)
 
     # checks
@@ -59,7 +66,7 @@ end
 
 function computeA(Δx,x,n,freq,height,mass,shiftA)
     """ define the technological progress A(i)"""
-    A = sin.(2*π*(x .+ shiftA)/n*freq) .+ height
+    A = 0.5*sin.(2*π*(x .+ shiftA)/n*freq) .+ height
     A = mass * A / ( sum(A) * Δx )
     return A
 end

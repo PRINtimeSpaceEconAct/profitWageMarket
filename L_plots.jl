@@ -1,4 +1,10 @@
-function plotSol(sol,p; NSteps = 1000, fName = "animation.mp4")
+"""
+plotSol(sol, p; NSteps=1000, video=false, fName="animation.mp4")
+
+- Plots the time evolution of firms' density μ(x, t) and profits π(x, t), alongside their steady states.
+- If video=true, records an animation to fName.
+"""
+function plotSol(sol,p; NSteps = 1000, video = false, fName = "animation.mp4")
 
     @unpack_parameters p
     lmax = 1.1*max(maximum(sol))
@@ -24,11 +30,11 @@ function plotSol(sol,p; NSteps = 1000, fName = "animation.mp4")
     display(fig)
 
 
-    record(fig, fName, LinRange(0, T_end, NSteps)) do t
-        @show t
-
+    # Loop through time steps
+    for t in LinRange(0, p.T_end, NSteps)
+        # Compute profits
         profits = computeProfits(sol(t),p)
-        # production = computeProduction(sol(t),p)
+        profits[isinf.(profits)] .= 0
 
         # Update the data in the lines
         firm_density_line[2] = sol(t)
@@ -42,11 +48,36 @@ function plotSol(sol,p; NSteps = 1000, fName = "animation.mp4")
         sleep(0.01)
     end
 
+    if video
+        # Define the recording
+        record(fig, fName, LinRange(0, p.T_end, NSteps)) do t
+            # Compute profits
+            profits = computeProfits(sol(t),p)
+            profits[isinf.(profits)] .= 0
+            # Update the data in the lines
+            firm_density_line[2] = sol(t)
+            profits_line[2] = profits
+            derivative_profits_line[2] = ∂x(profits,p)
+
+            # Update title
+            ax.title = "t = " * string(round(t, digits = 3))
+            
+            display(fig)
+            sleep(0.01)
+        end
+    end
+
     return nothing
 end
 
 
-function crossSectionalsPlot(sol,p; NSteps = 1000, fName = "crossPlot.mp4")
+"""
+crossSectionalsPlot(sol, p; NSteps=1000, video=false, fName="crossPlot.mp4")
+
+- Shows μ(x, t) and π(x, t) over x and their cross-sectional plots (sorted by value).
+- If video=true, records an animation to fName.
+"""
+function crossSectionalsPlot(sol,p; NSteps = 1000, video = false, fName = "crossPlot.mp4")
 
     @unpack_parameters p
     # f(x) = -tan(5.5*(x-1/4))+30
@@ -73,10 +104,10 @@ function crossSectionalsPlot(sol,p; NSteps = 1000, fName = "crossPlot.mp4")
     ax4 = Axis(fig[2, 2], title = "Cross Sectional π")
 
     # Create lines for each plot
-    firm_density_line = lines!(ax, x, sol(0), linewidth = 3, label = "Firms' density")
-    profits_line = lines!(ax2, x, zeros(length(x)), linewidth = 3, label = "Profits per sector")
+    firm_density_line = lines!(ax, p.x, sol(0), linewidth = 3, label = "Firms' density")
+    profits_line = lines!(ax2, p.x, zeros(length(p.x)), linewidth = 3, label = "Profits per sector")
     firms_crossectional = lines!(ax3, crossμX0, crossμY, linewidth = 3, label = "Cross sectional firms' density")
-    profits_crossectional = lines!(ax4, crossProfitsX0, crossProfitsY, linewidth = 3, label = "Cross sectional firms' density")
+    profits_crossectional = lines!(ax4, crossProfitsX0, crossProfitsY, linewidth = 3, label = "Cross sectional profits")
 
     ax.limits = (0, n, 0.9*minimum(sol(0)), 1.1*maximum(sol(0)))
     ax2.limits = (0, n, 0.9*minimum(profits), 1.1*maximum(profits))
@@ -121,20 +152,23 @@ function crossSectionalsPlot(sol,p; NSteps = 1000, fName = "crossPlot.mp4")
 
 end
 
-function crossSectionalProfitsTwoTimes(sol,p)
-    fig = Figure(size = (1000, 1000))
-    ax = Axis(fig[1, 1])
+"""
+profitsTwoTimes(sol, p)
 
-    crossProfitsX0, crossProfitsY0 = toCrossectional(computeProfits(sol(0), p), p)
-    crossProfitsXT, crossProfitsYT = toCrossectional(computeProfits(sol(p.T_end), p), p)
+- Plots cross-sectional profits at t=0 and t=T_end.
+"""
+function profitsTwoTimes(sol,p)
+    fig = Figure(size = (1000, 1000))
+    ax = Axis(fig[1, 1],title="π")
+
+    crossProfitsX0,crossProfitsY0 = toCrossectional(computeProfits(sol(0),p),p)
+    crossProfitsXT,crossProfitsYT = toCrossectional(computeProfits(sol(p.T_end),p),p)
 
     lines!(ax, crossProfitsX0, crossProfitsY0, linewidth = 3, label = "Profits at period 0")
     lines!(ax, crossProfitsXT, crossProfitsYT, linewidth = 3, label = "Profits at period T")
 
-    ax.limits = (0.9*minimum(crossProfitsX0), 1.1*maximum(crossProfitsX0), 0.9*minimum(crossProfitsY0), 1.1*maximum(crossProfitsY0))
     axislegend(ax)
     display(fig)
-    Makie.save("crossSectionalProfitsTwoTimes.png",fig)
 end
 
 function profitsVSΔProfits(sol,p)
