@@ -1,4 +1,4 @@
-# Profit-Wage Market Dynamics
+# Code used in ''The invisible hand as an emergent property: a gradient flow approach''
 
 A Julia codebase for simulating firm density dynamics over a continuous goods space with heterogeneous technology and labor.
 
@@ -29,10 +29,10 @@ runAll(p)
 
 ## Model Mechanics
 
-The state variable is firm density μ(x,t) over goods space x ∈ [0,n]. At each point:
+The state variable is firm density $\mu(x,t)$ over goods space $x \in [0,n]$. At each point:
 
 - Technology levels A(x) and labor L(x) determine local productivity
-- Firms enter/exit based on profit differentials
+- Firms reallocation based on profit differentials
 - Aggregate price index P depends on the full distribution
 - Cross-sectional analysis transforms spatial to ranked distributions
 
@@ -40,7 +40,7 @@ The state variable is firm density μ(x,t) over goods space x ∈ [0,n]. At each
 
 ```julia
 # Solve individual models
-p = parameters(β=0.8, σ=0.5)
+p = parameters(n = 1.0, T_end = 2.0)
 sol, p = solveModel(p)          # Baseline
 sol_mob, p = solveModelMobile(p) # Mobile variant  
 sol_fc, p = solveModelFixedCost(p) # Fixed cost
