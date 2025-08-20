@@ -40,18 +40,22 @@ end
 
 """
 runAll(p)
-Convenience: solves baseline, mobile, fixed–cost models and produces paper figures 1–6.
+Convenience: solves baseline, mobile, fixed–cost models and produces paper figures.
 """
 function runAll(p)
-    sol_base,_ = solveModel(p)
-    plot1(sol_base,p,0.0,0.2)
-    plot2(sol_base,p,0.01,0.5,2.0)
+    sol,p = solveModel(p)
+    plot1(sol,p,0,0.2)
+    plot2(sol,p,0.01,0.5,2)
     plot3()
     plot4()
-    sol_fc,_ = solveModelFixedCost(p)
-    plot5(p,0.01,0.5,2.0)
-    plot6(p,0.0,0.2,2.0)
-    sol_mob,_ = solveModelMobile(p)  # solved (placeholder if later mobile plots added)
-    return (sol_base, sol_mob, sol_fc)
-end
 
+    sol,p = solveModelFixedCost(p)
+    plot5(p,0.01,0.1,2)
+    plot6(p,0,0.2,2)
+
+    sol,p = solveModel(p)
+    plot7(sol,p,0,0.2)
+    plot8(sol,p,0.01,0.5,2)
+    plot9()
+    
+end

@@ -1,3 +1,9 @@
+using CairoMakie               # ensure vector backend available
+CairoMakie.activate!()         # switch backend (must be before figure creation)
+
+# Helper to save EPS (adds .eps if missing)
+save_eps(name::AbstractString, fig) = save(endswith(lowercase(name), ".eps") ? name : name * ".eps", fig)
+
 # Use a global, monochrome theme with larger fonts and thicker lines
 Makie.set_theme!(Theme(
     fontsize = 32,
@@ -47,9 +53,7 @@ function plot1(sol,p,T1,T2)
     lines!(axA, x, muEq, linewidth = 5, color = :black,
            label = "t = ∞", linestyle = :dot)
 
-    axislegend(axA)
-    display(figA)
-    Makie.save("fig1a.png", figA)
+    axislegend(axA); display(figA); save_eps("fig1a", figA)
 
     # π figure (fig1b)
     figB = Figure(size = (1000, 1000))
@@ -63,9 +67,7 @@ function plot1(sol,p,T1,T2)
     lines!(axB, x, profitsEq, linewidth = 5, color = :black,
            label = "t = ∞", linestyle = :dot)
 
-    axislegend(axB)
-    display(figB)
-    Makie.save("fig1b.png", figB)
+    axislegend(axB); display(figB); save_eps("fig1b", figB)
 
     return nothing
 end
@@ -114,10 +116,7 @@ function plot2(sol,p,T1,T2,T3)
         strokecolor = :black,
         markersize = 14)
 
-    axislegend(ax)
-    display(fig)
-
-    Makie.save("fig2.png",fig)
+    axislegend(ax); display(fig); save_eps("fig2", fig)
 end
 
 function plot3()
@@ -154,10 +153,7 @@ function plot3()
     errNorm2 = [sqrt.(sum((sol(t) - muEq).^2*Δx)) for t in sol.t]
     lines!(ax, sol.t, log.(errNorm2), linewidth = 5, color = :black, label = "η = 0.3", linestyle = :dashdot)
 
-    axislegend(ax)
-    display(fig)
-
-    Makie.save("fig3.png",fig)
+    axislegend(ax); display(fig); save_eps("fig3", fig)
 end
 
 function plot4()
@@ -209,10 +205,7 @@ function plot4()
 
     ax.limits = (0, tmax, -0.001, 0.001)
 
-    axislegend(ax)
-    display(fig)
-
-    Makie.save("fig4.png",fig)
+    axislegend(ax); display(fig); save_eps("fig4", fig)
 end
 
 
@@ -262,10 +255,7 @@ function plot5(p,T1,T2,T3)
         strokecolor = :black,
         markersize = 14)
      
-    axislegend(ax)
-    display(fig)
-
-    Makie.save("fig5.png",fig)
+    axislegend(ax); display(fig); save_eps("fig5", fig)
 end
 
 function plot6(p,T1,T2,T3)
@@ -294,9 +284,7 @@ function plot6(p,T1,T2,T3)
     axislegend(ax)
 
     # Display figure
-    display(fig)
-
-    Makie.save("fig6.png",fig)
+    display(fig); save_eps("fig6", fig)
     return nothing
 
 
@@ -328,9 +316,7 @@ function plot7(sol,p,T1,T2)
     lines!(axA, x, productionEq, linewidth = 5, color = :black,
            label = "t = ∞", linestyle = :dot)
 
-    axislegend(axA) 
-    display(figA)
-    Makie.save("fig7a.png", figA)
+    axislegend(axA); display(figA); save_eps("fig7a", figA)
 
     # Y/L figure (fig7b)
     figB = Figure(size = (1000, 1000))
@@ -344,9 +330,7 @@ function plot7(sol,p,T1,T2)
     lines!(axB, x, LabourProductivityEq, linewidth = 5, color = :black,
            label = "t = ∞", linestyle = :dot)
 
-    axislegend(axB)
-    display(figB)
-    Makie.save("fig7b.png", figB)
+    axislegend(axB); display(figB); save_eps("fig7b", figB)
 
     return nothing
 end
@@ -395,10 +379,7 @@ function plot8(sol,p,T1,T2,T3)
         strokecolor = :black,
         markersize = 14)
 
-    axislegend(ax)
-    display(fig)
-
-    Makie.save("fig8.png",fig)
+    axislegend(ax); display(fig); save_eps("fig8", fig)
 end
 
 
@@ -424,9 +405,7 @@ function plot9()
     lines!(ax, sol.t, (Diff), linewidth = 5, color = :black, label = "Immobile labour", linestyle = :solid)
 
     # axislegend(ax)
-    display(fig)
-
-    Makie.save("fig9.png",fig)
+    display(fig); save_eps("fig9", fig)
 end
 
 # p = parameters()
@@ -441,5 +420,5 @@ end
 # sol,p = solveModel(p)
 # plot7(sol,p,0,0.2)
 # plot8(sol,p,0.01,0.5,2)
-plot9()
+# plot9()
 
